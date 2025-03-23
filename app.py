@@ -513,20 +513,22 @@ def forecast():
         history= request.args.get('history', type=int)
         days = request.args.get('days', type=int)
         train = request.args.get('train', type=int)
-        productid= request.args.get('productid', type=int)
+        sku=request.args.get('sku', type=str)
+        #productid= request.args.get('productid', type=int)
         # Validate input
-        if days is None or train is None or productid is None or history is None:
-            return jsonify({"error": "Please provide 'days' , 'train' , 'productid' and 'history' as query parameters"}), 400
+        if days is None or train is None or sku is None or history is None:
+            return jsonify({"error": "Please provide 'days' , 'train' , 'sku' and 'history' as query parameters"}), 400
         if days not in [30,60,90]:
             return jsonify({"error": "Days should be 30 , 60 or 90"}), 400
         if train not in [1,0]:
             return jsonify({"error": "Enter Train Status 1 or 0"}), 400
         #because now we have onlly 1 product so i choose prdouct id 1
-        if productid!=1:
-            return jsonify({"error": "Please provide Correct Product ID"}), 400
+        #if productid!=1:
+        #    return jsonify({"error": "Please provide Correct Product ID"}), 400
         
         model_filename = "model.pkl"
-        api_url = "https://api.opps.ae/api:gkv8FyaI/getHistoryOrders?sku=ABC-12345-S-BL"
+        #https://api.opps.ae/api:gkv8FyaI/getHistoryOrders?sku=ABC-12345-S-BL
+        api_url = f"https://api.opps.ae/api:gkv8FyaI/getHistoryOrders?sku={sku}"
         model = None
         #history work 
         sales_history = get_sales_history(api_url)
@@ -670,7 +672,7 @@ def forecast():
         # Create response with property names that match frontend and in the desired order
         response = {
             "Information":{
-                "Product Name :":ProductDict[productid],
+                "Product Name :":report['product_info']['name'],
                 "model_status":train
             },
             "history_data":history_data,
